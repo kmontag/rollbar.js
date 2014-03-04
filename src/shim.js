@@ -180,12 +180,14 @@ function _extendListenerPrototype(client, prototype) {
   if (prototype.hasOwnProperty && prototype.hasOwnProperty('addEventListener')) {
     var oldAddEventListener = prototype.addEventListener;
     prototype.addEventListener = function(event, callback, bubble) {
-      oldAddEventListener.call(this, event, client.wrap(callback), bubble);
+      var wrapped = client.wrap(callback.handleEvent || callback);
+      oldAddEventListener.call(this, event, wrapped, bubble);
     };
 
     var oldRemoveEventListener = prototype.removeEventListener;
     prototype.removeEventListener = function(event, callback, bubble) {
-      oldRemoveEventListener.call(this, event, callback._wrapped || callback, bubble);
+      var toRemove = callback.handleEvent || callback;
+      oldRemoveEventListener.call(this, event, toRemove._wrapped || toRemove, bubble);
     };
   }
 }
